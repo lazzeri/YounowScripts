@@ -1,9 +1,9 @@
 // ==UserScript==
-// @name         YouNow Mute Overview
-// @namespace    https://zerody.one
-// @version      0.3
-// @description  A simple moderator audit feature for YouNow
-// @author       ZerodyOne
+// @name         YouNow Chat 2.0
+// @namespace    https://streamnow.pro
+// @version      0.1
+// @description  A feature that replaces the Younow Chat with the streamnow one.
+// @author       Lazzeri
 // @match        https://www.younow.com/*
 // @grant        none
 // @run-at       document-start
