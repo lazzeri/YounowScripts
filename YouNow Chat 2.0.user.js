@@ -113,7 +113,7 @@
     {
         // Get the sent data
         const data = e.data;
-        const test = document.querySelectorAll('[title=' + data + '][class="truncate ng-star-inserted"]');
+        const test = document.querySelectorAll('[title="' + data + '"][class="truncate ng-star-inserted"]');
         if (test.length === 0)
         {
             return;
