@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         YouNow Chat 2.0
+// @name         Yonow Chat 2.0
 // @namespace    https://streamnow.pro
 // @version      0.1
-// @description  A feature that replaces the Younow Chat with the streamnow one.
+// @description  Integrates the Streamnow Chat into Younow
 // @author       Lazzeri
 // @match        https://www.younow.com/*
 // @grant        none
@@ -109,5 +109,21 @@
     })
     startScanRoutineForNewUserName();
 
+    window.addEventListener('message', function (e)
+    {
+        // Get the sent data
+        const data = e.data;
+        const test = document.querySelectorAll('[title=' + data + '][class="truncate ng-star-inserted"]');
+        if (test.length === 0)
+        {
+            return;
+        } else
+            test[0].click();
 
+        console.log(data);
+
+        // If you encode the message in JSON before sending them,
+        // then decode here
+        // const decoded = JSON.parse(data);
+    });
 })();
