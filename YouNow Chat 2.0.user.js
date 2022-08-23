@@ -13,19 +13,20 @@
 (async function ()
 {
     'use strict';
+    let publicUserId, publicBroadcastId;
 
-    function getUserId(userName)
+    function getUserInfo(userName)
     {
         return new Promise((resolve) =>
         {
             fetch("https://api.younow.com/php/api/broadcast/info/curId=0/user=" + userName).then(response => response.json()).then((broadcastInfo) =>
             {
-                return resolve(broadcastInfo.userId);
+                return resolve(broadcastInfo);
             });
         });
     }
 
-    function assignReferees(broadcastId, existingReferees, moderatorUserId, userId)
+    function assignReferees(moderatorUserId)
     {
 
         fetch("//api.younow.com/php/api/doAdminAction", {
@@ -33,7 +34,7 @@
                 "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
                 "x-requested-by": localStorage.getItem("requestBy")
             },
-            "body": "actionId=" + '10' + "&userId=" + userId + "&onUserId=" + moderatorUserId + "&broadcastId=" + broadcastId + "&broadcaster=0",
+            "body": "actionId=" + '10' + "&userId=" + publicUserId + "&onUserId=" + moderatorUserId + "&broadcastId=" + publicBroadcastId + "&broadcaster=0",
             "method": "POST",
             "mode": "cors",
             "credentials": "include"
@@ -56,7 +57,6 @@
     {
         let userName = '';
         let lastName = '';
-        let userId = '';
 
         noDelaySetInterval(async function ()
         {
@@ -78,7 +78,11 @@
             //We now know that we are on a Page and its a new Page so we get the data needed:
             lastName = document.URL.replaceAll('https://www.younow.com/', '');
             userName = lastName;
-            userId = await getUserId(userName);
+            let {userId, broadcastId} = await getUserInfo(userName);
+
+            publicUserId = userId;
+            publicBroadcastId = broadcastId;
+
             console.log('New User set!', userName, userId);
 
             //If the iFrame is already created, like switching from one stream we just change the iFrame src:
@@ -114,22 +118,25 @@
 
     function addParentListener()
     {
-        window.addEventListener('message', function (e)
+        window.addEventListener('message', async function (e)
         {
             // Get the sent data
             const data = e.data;
-            const test = document.querySelectorAll('[title="' + data + '"][class="truncate ng-star-inserted"]');
-            if (test.length === 0)
+            const {type, message} = JSON.parse(data);
+
+            switch (type)
             {
-                return;
-            } else
-                test[0].click();
-
-            console.log(data);
-
-            // If you encode the message in JSON before sending them,
-            // then decode here
-            // const decoded = JSON.parse(data);
+                case 'normalYounowTools':
+                    const test = document.querySelectorAll('[title="' + message + '"][class="truncate ng-star-inserted"]');
+                    if (test.length === 0)
+                        return;
+                    test[0].click();
+                    break;
+                case 'guest':
+                    const {userId} = await getUserInfo(message)
+                    assignReferees(userId);
+                    break;
+            }
         });
     }
 
