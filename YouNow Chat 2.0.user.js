@@ -28,6 +28,7 @@
 
     function assignReferees(moderatorUserId)
     {
+        console.log("actionId=" + '10' + "&userId=" + publicUserId + "&onUserId=" + moderatorUserId + "&broadcastId=" + publicBroadcastId + "&broadcaster=0");
 
         fetch("//api.younow.com/php/api/doAdminAction", {
             "headers": {
@@ -132,7 +133,7 @@
                         return;
                     test[0].click();
                     break;
-                case 'guest':
+                case 'makeTempModerator':
                     const {userId} = await getUserInfo(message)
                     assignReferees(userId);
                     break;
