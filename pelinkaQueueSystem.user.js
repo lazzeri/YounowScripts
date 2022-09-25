@@ -227,16 +227,16 @@
         switch (length)
         {
             //Send first Warning
-            case maxGifts - 2:
-                sendMessage('⚠ @' + userName + ' WARNING 3/5 SENT. NEXT GIFTS: ' + firstGiftTime + ' ADVERTENCIA 3/5 ENVIADO. PRÓXIMOS REGALOS: ' + firstGiftTime);
+            case 4:
+                sendMessage('⚠ @' + userName + ' WARNING 4/5 SENT. NEXT GIFTS: ' + firstGiftTime + ' ADVERTENCIA 3/5 ENVIADO. PRÓXIMOS REGALOS: ' + firstGiftTime + 'تحذير تم ارسال  4/5 . ارسل الهدايا التالية بعد :');
                 break;
             //Send second Warning
-            case maxGifts - 1:
-                sendMessage('⚠ @' + userName + ' WARNING 4/5 SENT. NEXT GIFTS: ' + firstGiftTime + ' ADVERTENCIA 4/5 ENVIADO. PRÓXIMOS REGALOS: ' + firstGiftTime);
+            case 5:
+                sendMessage('⚠ @' + userName + ' WARNING 5/5 SENT. NEXT GIFTS: ' + firstGiftTime + ' ADVERTENCIA 4/5 ENVIADO. PRÓXIMOS REGALOS: ' + firstGiftTime + 'تحذير تم ارسال  3/5 . ارسل الهدايا التالية بعد :');
                 break;
             //Block time baby!
-            case maxGifts:
-                sendMessage('🚨 USER ' + userName + ' BLOCKED FOR 1 HOUR');
+            case 6:
+                sendMessage('🚨 USER ' + userName + ' BLOCKED FOR 1 HOUR, Bloqueado durante una hora, تم الحظر لمدة 1 ساعة');
                 blockUser(userId);
                 break;
         }
@@ -285,3 +285,6 @@
     runCode();
 
 })();
+
+
+
