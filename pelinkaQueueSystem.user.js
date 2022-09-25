@@ -16,12 +16,13 @@
     //Both initiated in the beginning
     let broadcasterUserId;
     let broadcasterBroadcastId;
-    let local;
-    const userName = '123FreshLikeMe';
+    let local = 'en';
+    const userName = 'Mini_Pearl_Pelinka';
     const giftQueue = {};
     const maxGifts = 5;
     const maxTime = 5;
-    const blockTimeInHours = 2;
+    const blockTimeInHours = 1;
+    let blockedList = [];
 
     //Helper Functions ---------------------------------------------------
     function sleep(milliseconds)
@@ -44,18 +45,25 @@
         if (!oldItem)
         {
             localStorage.setItem('blockedUsers', JSON.stringify([userId]));
+            blockedList = [userId];
             return;
         }
 
         let oldArray = JSON.parse(oldItem);
 
         localStorage.setItem('blockedUsers', JSON.stringify([...oldArray, userId]));
+        blockedList = [...oldArray, userId];
     }
 
     const removeBlockedUserFromLocalStorage = (userId) =>
     {
         let oldItem = JSON.parse(localStorage.getItem('blockedUsers'));
         const filteredItem = oldItem.filter((elem) =>
+        {
+            return userId !== elem
+        });
+
+        blockedList = blockedList.filter((elem) =>
         {
             return userId !== elem
         });
@@ -89,7 +97,7 @@
         });
     }
 
-    const blockUser = (targetUserId) =>
+    const blockUser = async (targetUserId) =>
     {
         addBlockedUserToLocalStorage(targetUserId);
         fetch("//api.younow.com/php/api/doAdminAction", {
@@ -102,11 +110,8 @@
             "mode": "cors",
             "credentials": "include"
         });
-
-        setInterval(() =>
-        {
-            unblockUser(targetUserId);
-        }, 1000 * 60 * 60 * blockTimeInHours)
+        await sleep(1000 * 60 * 60 * blockTimeInHours);
+        unblockUser(targetUserId);
     }
 
     const unblockUser = (targetUserId) =>
@@ -145,12 +150,6 @@
                 cluster: "younow"
             });
             let channel = pusher.subscribe("public-channel_" + broadcasterUserId);
-
-            channel.bind('onChat', function (data)
-            {
-                let comment = data.message.comments[0];
-                callBack(comment);
-            });
 
 
             channel.bind('onGift', function (data)
@@ -228,19 +227,20 @@
         switch (length)
         {
             //Send first Warning
-            case 3:
-                sendMessage('⚠ @'+userName+'WARNING 3/5 NEXT GIFTS: ' + firstGiftTime + 'ADVERTENCIA 3/5 PRÓXIMOS REGALOS: '+ firstGiftTime);
+            case maxGifts - 2:
+                sendMessage('⚠ @' + userName + ' WARNING 3/5 SENT. NEXT GIFTS: ' + firstGiftTime + ' ADVERTENCIA 3/5 ENVIADO. PRÓXIMOS REGALOS: ' + firstGiftTime);
                 break;
             //Send second Warning
-            case 4:
-                sendMessage('⚠ @'+userName+'WARNING 4/5 NEXT GIFTS: ' + firstGiftTime + 'ADVERTENCIA 4/5 PRÓXIMOS REGALOS: '+ firstGiftTime);
+            case maxGifts - 1:
+                sendMessage('⚠ @' + userName + ' WARNING 4/5 SENT. NEXT GIFTS: ' + firstGiftTime + ' ADVERTENCIA 4/5 ENVIADO. PRÓXIMOS REGALOS: ' + firstGiftTime);
                 break;
             //Block time baby!
-            case 5:
-                sendMessage('🚨 USER' + userName + 'BLOCKED FOR 2 HOURS');
+            case maxGifts:
+                sendMessage('🚨 USER ' + userName + ' BLOCKED FOR 1 HOUR');
                 blockUser(userId);
                 break;
         }
+
     }
 
     const getTimeInSeconds = () =>
@@ -250,11 +250,17 @@
 
     const firstGiftTime = (array) =>
     {
+        if (array.length === 0)
+            return 0;
+
         return secondsToTime(maxTime * 60 - (getTimeInSeconds() - array[0]));
     }
 
     const checkGift = (userId, userName) =>
     {
+        if (blockedList.includes(userId))
+            return;
+
         //First we add the gift
         addToGiftQueue(userId);
         //Next filter out all the gifts that are too old
@@ -266,10 +272,9 @@
     //MAIN ----------------------------------------------------
     async function runCode()
     {
-        let {userId, broadcastId, locale} = await getUserInfo(userName);
+        let {userId, broadcastId} = await getUserInfo(userName);
         broadcasterBroadcastId = broadcastId;
         broadcasterUserId = userId;
-        local = locale;
 
         setupPusher(async (data) =>
         {
