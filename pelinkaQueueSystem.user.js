@@ -33,6 +33,34 @@
     }
 
     //Normal Functions ---------------------------------------------------
+    const addBlockedUserToLocalStorage = (userId) =>
+    {
+        let oldItem = localStorage.getItem('blockedUsers');
+
+        //If it's not set at all update
+        if (!oldItem)
+        {
+            localStorage.setItem('blockedUsers', JSON.stringify([userId]));
+            return;
+        }
+
+        let oldArray = JSON.parse(oldItem);
+
+        localStorage.setItem('blockedUsers', JSON.stringify([...oldArray, userId]));
+    }
+
+    const removeBlockedUserFromLocalStorage = (userId) =>
+    {
+        let oldItem = JSON.parse(localStorage.getItem('blockedUsers'));
+        const filteredItem = oldItem.filter((elem) =>
+        {
+            return userId !== elem
+        });
+
+        localStorage.setItem('blockedUsers', JSON.stringify(filteredItem));
+
+    }
+
     function getUserInfo(userName)
     {
         return new Promise((resolve) =>
@@ -60,6 +88,7 @@
 
     const blockUser = (targetUserId) =>
     {
+        addBlockedUserToLocalStorage(targetUserId);
         fetch("//api.younow.com/php/api/doAdminAction", {
             "headers": {
                 "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
@@ -74,6 +103,7 @@
 
     const unblockUser = (targetUserId) =>
     {
+        removeBlockedUserFromLocalStorage(targetUserId);
         var xhr = new XMLHttpRequest();
         xhr.open("POST", "https://api.younow.com/php/api/doAdminAction");
         xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
