@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         Plinko Queue System
+// @name         Pelinka Queue System
 // @namespace    https://streamnow.pro
 // @version      0.1
-// @description  Integrates the Streamnow Chat into Younow
+// @description  A queue system I use for the pelinka games
 // @author       Lazzeri
 // @match        https://www.younow.com/*
 // @grant        none
@@ -16,6 +16,7 @@
     //Both initiated in the beginning
     let broadcasterUserId;
     let broadcasterBroadcastId;
+    let local;
     const userName = '123FreshLikeMe';
     let giftQueue = [];
 
@@ -45,8 +46,16 @@
 
     const sendMessage = (text) =>
     {
-
-
+        fetch("//api.younow.com/php/api/broadcast/chat", {
+            "headers": {
+                "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+                "x-requested-by": localStorage.getItem("requestBy")
+            },
+            "body": "userId=" + broadcasterUserId + "&channelId=" + broadcasterUserId + "&comment=" + text + "&tsi=qTARYFhKsb&tdi=tV16GrJcrS&lang=" + local,
+            "method": "POST",
+            "mode": "cors",
+            "credentials": "include"
+        });
     }
 
     const blockUser = (targetUserId) =>
@@ -56,7 +65,7 @@
                 "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
                 "x-requested-by": localStorage.getItem("requestBy")
             },
-            "body": "actionId=" + 281474976710656 + "&userId=" + broadcasterUserId + "&onUserId=" + targetUserId + "&tsi=FXm2qPfg0D&tdi=yt12B0GFdq&lang=de",
+            "body": "actionId=" + 281474976710656 + "&userId=" + broadcasterUserId + "&onUserId=" + targetUserId + "&tsi=FXm2qPfg0D&tdi=yt12B0GFdq&lang=" + local,
             "method": "POST",
             "mode": "cors",
             "credentials": "include"
@@ -70,20 +79,9 @@
         xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
         xhr.setRequestHeader("X-Requested-By", localStorage.getItem("requestBy"));
         xhr.setRequestHeader('Accept', 'application/json');
-
         xhr.withCredentials = true;
 
-        let dataToSend = `actionId: 562949953421312,
-            userId: 55936410,
-            onUserId: 58583141,
-            comment: 'yo',
-            broadcastId: 216124010,
-            broadcaster: 0,
-            tsi: 'FXm2qPfg0D',
-            tdi: 'yt12B0GFdq',
-            lang: 'de'`
-
-        xhr.send("actionId=" + 562949953421312 + "&userId=" + broadcasterUserId + "&onUserId=" + targetUserId + "&tsi=FXm2qPfg0D&tdi=yt12B0GFdq&broadcaster=0&lang=de&comment=autoBan&broadcastId=" + broadcasterBroadcastId);
+        xhr.send("actionId=" + 562949953421312 + "&userId=" + broadcasterUserId + "&onUserId=" + targetUserId + "&tsi=FXm2qPfg0D&tdi=yt12B0GFdq&broadcaster=0&lang=" + local + "&comment=autoBan&broadcastId=" + broadcasterBroadcastId);
     }
 
     const setupPusher = (giftCallback) =>
@@ -146,17 +144,19 @@
     //MAIN ----------------------------------------------------
     async function runCode()
     {
-        let {userId, broadcastId} = await getUserInfo(userName);
+        let {userId, broadcastId, locale} = await getUserInfo(userName);
         broadcasterBroadcastId = broadcastId;
         broadcasterUserId = userId;
+        local = locale;
 
-        console.log(broadcastId);
+        sendMessage('Test');
 
         setupPusher(async (data) =>
         {
             blockUser(data.userId);
             await sleep(2000);
             unblockUser(data.userId);
+
         })
     }
 
