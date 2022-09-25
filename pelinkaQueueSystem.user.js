@@ -116,7 +116,7 @@
 
     const unblockUser = (targetUserId) =>
     {
-        removeBlockedUserFromLocalStorage(targetUserId);
+        //removeBlockedUserFromLocalStorage(targetUserId);
         var xhr = new XMLHttpRequest();
         xhr.open("POST", "https://api.younow.com/php/api/doAdminAction");
         xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
@@ -228,15 +228,15 @@
         {
             //Send first Warning
             case 4:
-                sendMessage('⚠ @' + userName + ' WARNING 4/5 SENT. NEXT GIFTS: ' + firstGiftTime + ' ADVERTENCIA 3/5 ENVIADO. PRÓXIMOS REGALOS: ' + firstGiftTime + 'تحذير تم ارسال  4/5 . ارسل الهدايا التالية بعد :');
+                sendMessage('⚠ @' + userName + ' WARNING 4/5 SENT. NEXT GIFTS: ' + firstGiftTime + ' ADVERTENCIA 3/5 ENVIADO. PRÓXIMOS REGALOS: ' + firstGiftTime);
                 break;
             //Send second Warning
             case 5:
-                sendMessage('⚠ @' + userName + ' WARNING 5/5 SENT. NEXT GIFTS: ' + firstGiftTime + ' ADVERTENCIA 4/5 ENVIADO. PRÓXIMOS REGALOS: ' + firstGiftTime + 'تحذير تم ارسال  3/5 . ارسل الهدايا التالية بعد :');
+                sendMessage('⚠ @' + userName + ' WARNING 5/5 SENT. NEXT GIFTS: ' + firstGiftTime + ' ADVERTENCIA 4/5 ENVIADO. PRÓXIMOS REGALOS: ' + firstGiftTime);
                 break;
             //Block time baby!
             case 6:
-                sendMessage('🚨 USER ' + userName + ' BLOCKED FOR 1 HOUR, Bloqueado durante una hora, تم الحظر لمدة 1 ساعة');
+                sendMessage('🚨 USER ' + userName + ' BLOCKED FOR 1 HOUR');
                 blockUser(userId);
                 break;
         }
@@ -285,6 +285,8 @@
     runCode();
 
 })();
+
+
 
 
 
