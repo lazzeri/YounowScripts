@@ -18,7 +18,10 @@
     let broadcasterBroadcastId;
     let local;
     const userName = '123FreshLikeMe';
-    let giftQueue = [];
+    const giftQueue = {};
+    const maxGifts = 5;
+    const maxTime = 5;
+    const blockTimeInHours = 2;
 
     //Helper Functions ---------------------------------------------------
     function sleep(milliseconds)
@@ -99,6 +102,11 @@
             "mode": "cors",
             "credentials": "include"
         });
+
+        setInterval(() =>
+        {
+            unblockUser(targetUserId);
+        }, 1000 * 60 * 60 * blockTimeInHours)
     }
 
     const unblockUser = (targetUserId) =>
@@ -171,6 +179,90 @@
     }
 
 
+    const addToGiftQueue = (userId) =>
+    {
+        //First we add the gift to the corresponding path;
+        if (giftQueue[userId])
+        {
+            giftQueue[userId].push(getTimeInSeconds());
+        } else
+        {
+            giftQueue[userId] = [getTimeInSeconds()];
+        }
+
+        return giftQueue[userId];
+    }
+
+    const filterGifts = (userId) =>
+    {
+        return giftQueue[userId].filter(elem =>
+        {
+            return (getTimeInSeconds() - elem) < 60 * maxTime;
+        })
+    }
+
+    const secondsToTime = (timeInSeconds) =>
+    {
+        var sec_num = parseInt(timeInSeconds, 10); // don't forget the second param
+        var hours = Math.floor(sec_num / 3600);
+        var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
+        var seconds = sec_num - (hours * 3600) - (minutes * 60);
+
+        if (hours < 10)
+        {
+            hours = "0" + hours;
+        }
+        if (minutes < 10)
+        {
+            minutes = "0" + minutes;
+        }
+        if (seconds < 10)
+        {
+            seconds = "0" + seconds;
+        }
+        return minutes + ':' + seconds;
+    }
+
+    const checkLength = (length, userId, userName, firstGiftTime) =>
+    {
+        switch (length)
+        {
+            //Send first Warning
+            case 3:
+                sendMessage('⚠ @'+userName+'WARNING 3/5 NEXT GIFTS: ' + firstGiftTime + 'ADVERTENCIA 3/5 PRÓXIMOS REGALOS: '+ firstGiftTime);
+                break;
+            //Send second Warning
+            case 4:
+                sendMessage('⚠ @'+userName+'WARNING 4/5 NEXT GIFTS: ' + firstGiftTime + 'ADVERTENCIA 4/5 PRÓXIMOS REGALOS: '+ firstGiftTime);
+                break;
+            //Block time baby!
+            case 5:
+                sendMessage('🚨 USER' + userName + 'BLOCKED FOR 2 HOURS');
+                blockUser(userId);
+                break;
+        }
+    }
+
+    const getTimeInSeconds = () =>
+    {
+        return Math.round(Date.now() / 1000);
+    }
+
+    const firstGiftTime = (array) =>
+    {
+        return secondsToTime(maxTime * 60 - (getTimeInSeconds() - array[0]));
+    }
+
+    const checkGift = (userId, userName) =>
+    {
+        //First we add the gift
+        addToGiftQueue(userId);
+        //Next filter out all the gifts that are too old
+        giftQueue[userId] = filterGifts(userId);
+        // Now we check the length
+        checkLength(giftQueue[userId].length, userId, userName, firstGiftTime(giftQueue[userId]));
+    }
+
     //MAIN ----------------------------------------------------
     async function runCode()
     {
@@ -179,14 +271,9 @@
         broadcasterUserId = userId;
         local = locale;
 
-        sendMessage('Test');
-
         setupPusher(async (data) =>
         {
-            blockUser(data.userId);
-            await sleep(2000);
-            unblockUser(data.userId);
-
+            checkGift(data.userId, data.name);
         })
     }
 
