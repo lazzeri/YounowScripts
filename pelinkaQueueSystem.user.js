@@ -228,11 +228,11 @@
         {
             //Send first Warning
             case 4:
-                sendMessage('⚠ @' + userName + ' WARNING 4/5 SENT. NEXT GIFTS: ' + firstGiftTime + ' ADVERTENCIA 3/5 ENVIADO. PRÓXIMOS REGALOS: ' + firstGiftTime);
+                sendMessage('⚠ @' + userName + ' WARNING 4/5 SENT. NEXT GIFTS: ' + firstGiftTime + ' ADVERTENCIA 4/5 ENVIADO. PRÓXIMOS REGALOS: ' + firstGiftTime);
                 break;
             //Send second Warning
             case 5:
-                sendMessage('⚠ @' + userName + ' WARNING 5/5 SENT. NEXT GIFTS: ' + firstGiftTime + ' ADVERTENCIA 4/5 ENVIADO. PRÓXIMOS REGALOS: ' + firstGiftTime);
+                sendMessage('⚠ @' + userName + ' WARNING 5/5 SENT. NEXT GIFTS: ' + firstGiftTime + ' ADVERTENCIA 5/5 ENVIADO. PRÓXIMOS REGALOS: ' + firstGiftTime);
                 break;
             //Block time baby!
             case 6:
