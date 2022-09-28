@@ -117,6 +117,10 @@
         const {userId} = await getUserInfo(userName);
         setupPusher(userId, async (data) =>
         {
+            //Ignore own comments
+            if(parseInt(data.userId) === parseInt(userId))
+                return;
+
             triggerEvent(data.name, data.comment, userId);
         })
     }
