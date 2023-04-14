@@ -105,7 +105,7 @@
                 iFrameElem.style.width = '100%';
                 iFrameElem.src = 'https://streamnow.pro/popupchat?cid=' + userId;
                 iFrameElem.classList = div[0].parentNode.classList;
-                document.getElementsByClassName('chat-list')[0].append(iFrameElem);
+                document.getElementsByClassName('chat-list')[0].parentElement.append(iFrameElem);
             })
 
         }, 1000);
